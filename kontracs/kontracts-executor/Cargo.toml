@@ -1,0 +1,74 @@
+[package]
+name = "kontracts-executor"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sp-runtime-interface = { version = "7.0.0", default-features = false, git = "https://github.com/paritytech/substrate.git", "branch" = "polkadot-v0.9.35" }
+scale-info = { version = "2.1.1", default-features = false, features = ["derive"] }
+frame-support = { version = "4.0.0-dev", default-features = false, git = "https://github.com/paritytech/substrate.git", "branch" = "polkadot-v0.9.35" }
+sp-std = { version = "5.0.0", default-features = false, git = "https://github.com/paritytech/substrate.git", "branch" = "polkadot-v0.9.35" }
+sp-io = { version = "7.0.0", default-features = false, git = "https://github.com/paritytech/substrate.git", "branch" = "polkadot-v0.9.35" }
+sp-core = { version = "7.0.0", default-features = false, git = "https://github.com/paritytech/substrate.git", "branch" = "polkadot-v0.9.35" }
+codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = [
+	"derive",
+] }
+
+# current version of wasmtime
+#wasmtime = { version = "5.0.0", optional = true }
+
+# Dependency if I want to use the executor wrapped by substrate
+#sc-executor-wasmtime = { version = "0.10.0-dev", optional = true, git = "https://github.com/paritytech/substrate.git", "branch" = "polkadot-v0.9.35" }
+
+
+# Try to use directly all wasm
+#cfg-if = "1.0"
+libc = { version = "0.2.121", optional = true}
+#log = "0.4.17"
+
+# When bumping wasmtime do not forget to also bump rustix
+# to exactly the same version as used by wasmtime!
+wasmtime = { version = "1.0.0", optional = true, default-features = false, features = [
+	"wat",
+	"cache",
+	"cranelift",
+	"jitdump",
+	"parallel-compilation",
+	"memory-init-cow",
+	"pooling-allocator",
+] }
+#sc-allocator = { version = "4.1.0-dev", path = "../../allocator" }
+#sc-executor-common = { version = "0.10.0-dev", path = "../common" }
+#sp-wasm-interface = { version = "7.0.0", path = "../../../primitives/wasm-interface" }
+
+# Here we include the rustix crate in the exactly same semver-compatible version as used by
+# wasmtime and enable its 'use-libc' flag.
+#
+# By default rustix directly calls the appropriate syscalls completely bypassing libc;
+# this doesn't have any actual benefits for us besides making it harder to debug memory
+# problems (since then `mmap` etc. cannot be easily hooked into).
+rustix = { version = "0.35.9", optional = true, default-features = false, features = ["std", "mm", "fs", "param", "use-libc"] }
+#once_cell = "1.12.0"
+
+[features]
+default = ["std"]
+std = [
+	"sp-runtime-interface/std",
+	"sp-std/std",
+	"sp-io/std",
+	"sp-core/std",
+	"codec/std",
+    "frame-support/std",
+    "scale-info/std",
+    #"dep:sc-executor-wasmtime",
+	#"sc-executor-wasmtime/std",
+
+    #"dep:cfg-if",
+    "dep:libc",
+    #"dep:log",
+    "dep:wasmtime",
+    #"dep:sc-allocator",
+    #"dep:sp-wasm-interface",
+    "dep:rustix",
+    #"dep:once_cell",
+]
